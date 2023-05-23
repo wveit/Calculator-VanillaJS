@@ -1,70 +1,97 @@
+class Calculator {
+  firstNum = "";
+  operator = "";
+  secondNum = "";
+
+  addSymbol(symbol) {
+    if (["+", "-", "*", "/"].includes(symbol)) {
+      if (this.secondNum) {
+        return;
+      }
+      this.operator = symbol;
+    } else if (symbol === "." || (symbol >= "0" && symbol <= "9")) {
+      if (!this.operator) {
+        this.firstNum += symbol;
+      } else {
+        this.secondNum += symbol;
+      }
+    } else if (symbol === "=") {
+      this.firstNum = this.getAnswerString() || "0";
+      this.operator = "";
+      this.secondNum = "";
+    }
+  }
+
+  getInputString() {
+    if (!this.firstNum) return "0";
+    let inputString = this.firstNum || "0";
+    if (this.operator) {
+      inputString += ` ${this.operator}`;
+    }
+    if (this.secondNum) {
+      inputString += ` ${this.secondNum}`;
+    }
+    return inputString;
+  }
+
+  getAnswerString() {
+    if (!this.secondNum) return "";
+    const firstNum = Number(this.firstNum);
+    const secondNum = Number(this.secondNum);
+    switch (this.operator) {
+      case "+":
+        return firstNum + secondNum + "";
+      case "-":
+        return firstNum - secondNum + "";
+      case "*":
+        return firstNum * secondNum + "";
+      case "/":
+        return firstNum / secondNum + "";
+      default:
+        return "";
+    }
+  }
+
+  delete() {
+    if (this.secondNum) {
+      this.secondNum = removeLastCharacter(this.secondNum);
+    } else if (this.operator) {
+      this.operator = "";
+    } else {
+      this.firstNum = removeLastCharacter(this.firstNum);
+    }
+  }
+
+  clear() {
+    this.firstNum = "";
+    this.operator = "";
+    this.secondNum = "";
+  }
+}
+
+function removeLastCharacter(str) {
+  return str.substring(0, str.length - 1);
+}
+
+// the app
+
 const inputDisplay = document.querySelector(".numDisplay");
 const operatorDisplay = document.querySelector(".operatorDisplay");
-const numbers = document.querySelectorAll(".number");
-const operators = document.querySelectorAll(".operator");
-const dot = document.querySelector(".dot");
-const reset = document.querySelector(".reset");
-const clear = document.querySelector(".delete");
-let displayValue = 0;
-let firstNum = "";
-let secondNum = "";
-let operator = "";
+const buttons = document.querySelectorAll(".calculator-buttons > .btn");
 
-// numbers.forEach((number) => {
-//   number.addEventListener("click", (e) => {
-//     // Read first number if no operator set yet
-//     firstNum += e.target.innerText;
-//     inputDisplay.textContent = firstNum;
-//   });
-// });
+const calculator = new Calculator();
 
-// operators.forEach((op) => {
-//   op.addEventListener("click", (e) => {
-//     operator = e.target.innerText;
-//     operatorDisplay.textContent = operator;
-//     if (!operator === "") {
-//     }
-//     // If equals operator, perform operation
-//   });
-// });
-numbers.forEach((number) => {
-  number.addEventListener("click", (e) => {
-    if (operator === "") {
-      // Read first number if no operator set yet
-      firstNum += e.target.innerText;
-      inputDisplay.textContent = firstNum;
+buttons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const symbol = event.target.innerHTML;
+    if (symbol === "Delete") {
+      calculator.delete();
+    } else if (symbol === "Reset") {
+      calculator.clear();
     } else {
-      // Read second number
-      secondNum += e.target.innerText;
+      calculator.addSymbol(symbol);
     }
-  });
-});
-
-operators.forEach((op) => {
-  op.addEventListener("click", (e) => {
-    if (e.target.innerText !== "=") {
-      // If the operator is not equals
-      operator = e.target.innerText;
-
-      console.log(firstNum); // Print the first number
-      console.log(operator); // Print the operator
-    } else {
-      // If equals button clicked
-      console.log(secondNum); // Print 2nd number
-
-      switch (
-        operator // Calculate and print output
-      ) {
-        case "+":
-          console.log(parseInt(firstNum) + parseInt(secondNum));
-          break;
-        case "-":
-          console.log(parseInt(firstNum) - parseInt(secondNum));
-          break;
-        // etc...
-        default:
-          break;
-      }
-    }
+    inputDisplay.innerHTML = calculator.getInputString();
+    operatorDisplay.innerHTML = calculator.getAnswerString();
   });
 });
