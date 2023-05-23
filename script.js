@@ -73,6 +73,15 @@ function removeLastCharacter(str) {
   return str.substring(0, str.length - 1);
 }
 
+function standardizeSymbol(str) {
+  const alternativeSymbols = {
+    "−": "-",
+    "÷": "/",
+    "×": "*",
+  };
+  return alternativeSymbols[str] || str;
+}
+
 // the app
 
 const inputDisplay = document.querySelector(".numDisplay");
@@ -83,7 +92,7 @@ const calculator = new Calculator();
 
 buttons.forEach((button) => {
   button.addEventListener("click", (event) => {
-    const symbol = event.target.innerHTML;
+    const symbol = standardizeSymbol(event.target.innerHTML);
     if (symbol === "Delete") {
       calculator.delete();
     } else if (symbol === "Reset") {
